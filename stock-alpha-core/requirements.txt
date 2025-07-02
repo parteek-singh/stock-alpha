@@ -1,0 +1,9 @@
+numpy==1.24.4
+fastapi
+uvicorn
+requests
+requests-cache
+pandas
+yfinance
+python-dotenv
+pandas-ta
