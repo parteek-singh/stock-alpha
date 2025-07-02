@@ -23,6 +23,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
+
 @app.get("/api/ohlcv")
 def get_ohlcv(symbol: str = "AAPL", interval: str = "1d"):
     df = fetch_ohlcv(symbol, interval)  # your existing function
