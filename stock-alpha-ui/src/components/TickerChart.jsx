@@ -23,7 +23,7 @@ const TickerChart = (props) => {
     const fetchChartData = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/api/ohlcv?symbol=${symbol}&interval=${interval}`
+          `${import.meta.env.VITE_API_URL}/ohlcv?symbol=${symbol}&interval=${interval}`
         );
         const data = await res.json();
 

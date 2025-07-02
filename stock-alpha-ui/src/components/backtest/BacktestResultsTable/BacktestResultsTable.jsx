@@ -36,22 +36,22 @@ const BacktestResultsTable = ({ results }) => {
         </div>
       </div>
       <p className="card-label">Exit reasons - condition matched</p>
-      {/* <div className="summary-cards">
+      <div className="summary-cards">
         
         <div className="card">
           <div className="card-label">Exit condition</div>
-          <div className="card-value">{data.exit_reasons.exit_condition}</div>
+          <div className="card-value">{data.exit_reasons?.exit_condition}</div>
         </div>
         
         <div className="card">
           <div className="card-label">Stop loss</div>
-          <div className="card-value">{data.exit_reasons.stop_loss}</div>
+          <div className="card-value">{data.exit_reasons?.stop_loss}</div>
         </div>
         <div className="card">
           <div className="card-label">Both</div>
-          <div className="card-value">{data.exit_reasons.both}</div>
+          <div className="card-value">{data.exit_reasons?.both}</div>
         </div>
-      </div> */}
+      </div>
 
       <table className="backtest-table">
         <thead>

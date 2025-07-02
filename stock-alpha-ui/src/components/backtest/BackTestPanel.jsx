@@ -7,8 +7,8 @@ import BacktestResultsTable from "./BacktestResultsTable/BacktestResultsTable.js
 const BackTestPanel = (props) => {
   const [results, setResults] = useState(null);
 
-  const [startDate, setStartDate] = useState("2025-02-01");
-  const [endDate, setEndDate] = useState("2025-02-28");
+  const [startDate, setStartDate] = useState("2025-01-01");
+  const [endDate, setEndDate] = useState("2025-06-28");
   const [stoploss, setStoploss] = useState(3);
   const [entryConditions, setEntryConditions] = useState({
     logic: "and",
@@ -30,7 +30,7 @@ const BackTestPanel = (props) => {
       stop_loss: stoploss || 5,
     };
 
-    fetch("http://localhost:8000/api/backtest", {
+    fetch(`${import.meta.env.VITE_API_URL}/backtest`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
