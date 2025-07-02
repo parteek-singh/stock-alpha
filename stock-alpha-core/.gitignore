@@ -81,3 +81,7 @@ Pipfile.lock
 
 # Poetry
 poetry.lock
+
+instance/
+logs/
+
