@@ -119,13 +119,42 @@ def fetch_from_yfinance_new(symbol: str, interval: str = "1d") -> pd.DataFrame:
     data.rename(columns={"Date": "datetime"}, inplace=True)
     return data[["datetime", "Open", "High", "Low", "Close", "Volume"]]
 
-def fetch_from_yfinance(symbol: str) -> pd.DataFrame:
-    print(f"🔁 Fallback: Fetching {symbol} from yFinance")
-    df = yf.download(symbol, period="6mo", interval="1d", progress=False)
-    df.rename(columns=str.title, inplace=True)
-    return df
+def fetch_from_yfinance(symbol: str, interval: str) -> pd.DataFrame:
+    # print(f"🔁 Fallback: Fetching {symbol} from yFinance")
+    # df = yf.download(symbol, period="6mo", interval="1d", progress=False)
+    # df.rename(columns=str.title, inplace=True)
+    # return df
+    print(f"🔁 Fetching {symbol} from yFinance (interval={interval})")
+
+    # Map interval to yfinance-friendly format
+    if interval == "1min" or interval == "1m":
+        data = yf.download(
+            symbol,
+            interval="1m",
+            period="5d",          # 1m interval only supports period, not start/end
+            auto_adjust=False,
+            progress=False,
+        )
+    else:
+        data = yf.download(
+            symbol,
+            interval=interval,
+            start="2020-01-01",   # or your dynamic range
+            end=pd.Timestamp.today().strftime("%Y-%m-%d"),
+            auto_adjust=False,
+            progress=False,
+        )
+
+    if data.empty:
+        print(f"⚠️ yFinance returned no data for {symbol}")
+        return pd.DataFrame()
+
+    data.rename(columns=str.capitalize, inplace=True)
+    data.index.name = "datetime"
+    return data
 
 def fetch_ohlcv(symbol: str, interval: str = "1d") -> pd.DataFrame:
+    print(f"🔍 Fetching OHLCV data for {symbol} at {interval} interval")
     # Try CSV cache first
     df = load_from_csv(symbol, interval)
     if df is not None and not df.empty:
@@ -133,13 +162,13 @@ def fetch_ohlcv(symbol: str, interval: str = "1d") -> pd.DataFrame:
     else:
         # Try Finnhub
         try:
-            df = fetch_from_finnhub(symbol)
+            df = fetch_from_finnhub_new(symbol, interval)
             print("📡 Loaded from Finnhub")
         except Exception as e:
             print(f"⚠️ Finnhub failed: {e}")
             # Fallback to yfinance
             try:
-                df = fetch_from_yfinance(symbol)
+                df = fetch_from_yfinance(symbol, interval)
                 print("🪙 Fallback to yfinance")
             except Exception as e2:
                 print(f"❌ yfinance failed: {e2}")

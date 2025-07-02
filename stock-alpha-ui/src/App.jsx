@@ -6,18 +6,16 @@ import TickerSearchBar from "./components/ticker_search/TickerSerachBar";
 function App() {
   const [symbol, setSymbol] = useState("");
   const [interval, setInterval] = useState("");
-  const [refreshChart, setRefreshChart] = useState(true);
+  const [refreshChart, setRefreshChart] = useState(false);
+  const [showTickerChart, setShowTickerChart] = useState(false);
   const [backTestResult, setBackTestResult] = useState([]);
 
-  const handleSymbolChange = (newSymbol) => {
-    setSymbol(newSymbol);
+  const handleTickerSearchChange = (symbol, interval) => {
+    setSymbol(symbol);
+    setInterval(interval);
+    setShowTickerChart(true);
     handleRefreshChart();
-    console.log("Symbol changed to:", newSymbol);
-  };
-
-  const handleIntervalChange = (newInterval) => {
-    setInterval(newInterval);
-    handleRefreshChart();
+    console.log("Symbol changed to:", symbol + " with interval: " + interval);
   };
 
   const handleRefreshChart = () => {
@@ -37,8 +35,9 @@ const onResultCall = (results) =>{
 
   return (
     <div id="sd" style={{margin:"10px"}}>
-      <TickerSearchBar onSymbolChange={handleSymbolChange} onIntervalChange={handleIntervalChange} />
-      {refreshChart && <TickerChart symbol={symbol} interval={interval} backTestResult={backTestResult}/>}
+      <h1>Stock</h1>
+      <TickerSearchBar  onChange={handleTickerSearchChange} />
+      {refreshChart && showTickerChart && <TickerChart symbol={symbol} interval={interval} backTestResult={backTestResult}/>}
       <BackTestPanel symbol={symbol} interval={interval} onResult={onResultCall}/>
     </div>
   );

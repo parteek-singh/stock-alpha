@@ -2,7 +2,7 @@ import operator
 
 from utils.indicator_utils import IndicatorUtils
 from typing import List, Union
-from models import Condition, ConditionGroup
+from models.condition_models import Condition, ConditionGroup
 import pandas as pd
 
 # Supported operators

@@ -7,9 +7,7 @@ const TickerChart = (props) => {
   const [symbol, setSymbol] = useState("AAPL");
   const [interval, setInterval] = useState("1d");
   const [hoverData, setHoverData] = useState(null);
-  const [backtestResults, setBacktestResults] = useState(null);
-  // const [showTrades, setShowTrades] = useState(true);
-  // const [tooltipData, setTooltipData] = useState(null);
+
 
   const tradeColor = (type, pnl) => {
     if (type === "buy") return pnl >= 0 ? "#4CAF50" : "#F44336";   // green/red
@@ -17,13 +15,19 @@ const TickerChart = (props) => {
   };
 
   useEffect(() => {
-    setBacktestResults(props.backtestResults || null);
-    setSymbol(props.symbol || "AAPL");
-    setInterval(props.interval || "1d");
+  
+    setSymbol(props.symbol);
+    setInterval(props.interval);
+    if (!props.symbol || !props.interval) {
+      console.warn("TickerChart: Missing symbol or interval props");
+      return;
+    }
+    
     const fetchChartData = async () => {
       try {
+        console.log("TickerChart props:", props, symbol, interval, props.symbol, props.interval);
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/ohlcv?symbol=${symbol}&interval=${interval}`
+          `${import.meta.env.VITE_API_URL}/ohlcv?symbol=${props.symbol}&interval=${props.interval}`
         );
         const data = await res.json();
 
@@ -71,11 +75,43 @@ const TickerChart = (props) => {
             localization: {
               timeFormatter: (timestamp) => {
                 const date = new Date(timestamp * 1000);
-                return date.toISOString().split("T")[0]; // YYYY-MM-DD
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                const dd = String(date.getDate()).padStart(2, "0");
+                const hh = String(date.getHours()).padStart(2, "0");
+                const mi = String(date.getMinutes()).padStart(2, "0");
+                return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;  // ✅ YYYY-MM-DD HH:mm
               },
             },
           });
 
+          // chart.timeScale().applyOptions({
+          //   timeVisible: true,
+          //   secondsVisible: props.interval === "1m", // optional, only show seconds if needed
+          // });
+          let lastDateLabel = "";
+
+          chart.timeScale().applyOptions({
+            timeVisible: true,
+            tickMarkFormatter: (timestamp) => {
+              const date = new Date(timestamp * 1000);
+              const yyyy = date.getFullYear();
+              const mm = String(date.getMonth() + 1).padStart(2, "0");
+              const dd = String(date.getDate()).padStart(2, "0");
+              const hh = String(date.getHours()).padStart(2, "0");
+              const mi = String(date.getMinutes()).padStart(2, "0");
+
+              const currentDateLabel = `${yyyy}-${mm}-${dd}`;
+
+              if (lastDateLabel !== currentDateLabel) {
+                lastDateLabel = currentDateLabel;
+                return `${currentDateLabel} ${hh}:${mi}`; // date + time
+              }
+
+              return `${hh}:${mi}`; // only time
+            },
+          });
+          
           
 
 
@@ -181,11 +217,11 @@ const TickerChart = (props) => {
         chartRef.current = null;
       }
     };
-  }, [symbol, interval, backtestResults]);
+  }, []);
 
   return (
     <div style={{ padding: 20 }}>
-      <h2>📈 Ticker Chart Viewer</h2>
+      <h2>📈 Ticker Chart Viewer - {symbol}</h2>
       
       {hoverData && (
         <div style={{ marginBottom: 10, fontFamily: "monospace" }}>
